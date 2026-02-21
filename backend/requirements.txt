@@ -4,7 +4,7 @@ uvicorn[standard]==0.27.0
 python-multipart==0.0.6
 
 # PDF
-PyMuPDF==1.23.8
+PyMuPDF==1.24.14  # 更新版本，有預編譯 wheel
 pikepdf==8.11.2
 pdf2image==1.17.0
 img2pdf==0.5.1
