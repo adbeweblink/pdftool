@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { Upload, Download, ArrowLeft, X, CheckCircle, Loader2, AlertCircle, HelpCircle } from 'lucide-react'
+import { Upload, Download, ArrowLeft, X, CheckCircle, Loader2, AlertCircle, HelpCircle, Key, ExternalLink } from 'lucide-react'
 import { SortableFileList, PDFThumbnail, ProgressBar, FileItem as SortableFileItem } from '@/components/pdf'
 import { useToast } from '@/components/ui/Toast'
 import { toolConfig } from './toolConfig'
@@ -48,8 +48,25 @@ export default function ToolPageClient({ toolId }: ToolPageClientProps) {
   const [globalStatus, setGlobalStatus] = useState<ProcessStatus>('idle')
   const [globalProgress, setGlobalProgress] = useState(0)
   const [isDragOver, setIsDragOver] = useState(false)
+  const [apiKey, setApiKey] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { addToast } = useToast()
+
+  // 從 localStorage 讀取 API Key
+  useEffect(() => {
+    const savedKey = localStorage.getItem('gemini_api_key')
+    if (savedKey) {
+      setApiKey(savedKey)
+    }
+  }, [])
+
+  // 儲存 API Key 到 localStorage
+  const saveApiKey = (key: string) => {
+    setApiKey(key)
+    if (key) {
+      localStorage.setItem('gemini_api_key', key)
+    }
+  }
 
   // 初始化選項預設值
   useEffect(() => {
@@ -184,6 +201,17 @@ export default function ToolPageClient({ toolId }: ToolPageClientProps) {
   const processFiles = async () => {
     if (files.length === 0) return
 
+    // 檢查是否需要 API Key
+    if (tool.requiresApiKey && !apiKey) {
+      addToast({
+        type: 'error',
+        title: '需要 API Key',
+        message: '請輸入您的 Gemini API Key 才能使用此功能',
+        duration: 5000,
+      })
+      return
+    }
+
     setGlobalStatus('uploading')
     setGlobalProgress(10)
 
@@ -194,6 +222,11 @@ export default function ToolPageClient({ toolId }: ToolPageClientProps) {
       files.forEach(f => formData.append('files', f.file))
     } else {
       formData.append('file', files[0].file)
+    }
+
+    // 添加 API Key（如果需要）
+    if (tool.requiresApiKey && apiKey) {
+      formData.append('api_key', apiKey)
     }
 
     // 添加選項
@@ -435,6 +468,38 @@ export default function ToolPageClient({ toolId }: ToolPageClientProps) {
               </div>
             )}
 
+            {/* API Key 輸入（BYOK） */}
+            {tool.requiresApiKey && (
+              <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-4 sm:mb-6">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                  <Key className="w-4 h-4 sm:w-5 sm:h-5 text-indigo-600 dark:text-indigo-400" />
+                  <h3 className="font-medium text-indigo-900 dark:text-indigo-100 text-sm sm:text-base">Gemini API Key</h3>
+                  <span className="text-xs bg-indigo-100 dark:bg-indigo-800 text-indigo-700 dark:text-indigo-300 px-2 py-0.5 rounded">必填</span>
+                </div>
+                <div className="space-y-2">
+                  <input
+                    type="password"
+                    value={apiKey}
+                    onChange={e => saveApiKey(e.target.value)}
+                    placeholder="輸入您的 Gemini API Key"
+                    className="w-full px-3 py-2.5 sm:py-2 border border-indigo-300 dark:border-indigo-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm sm:text-base bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                  />
+                  <p className="text-xs text-indigo-700 dark:text-indigo-300 flex items-center gap-1">
+                    <span>🔒 您的 API Key 僅儲存在瀏覽器本地，不會上傳到伺服器</span>
+                  </p>
+                  <a
+                    href="https://aistudio.google.com/apikey"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    免費取得 Gemini API Key
+                  </a>
+                </div>
+              </div>
+            )}
+
             {/* 選項 */}
             {tool.options && tool.options.length > 0 && (
               <div className="bg-white dark:bg-gray-800 rounded-lg sm:rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-4 mb-4 sm:mb-6">
@@ -496,9 +561,14 @@ export default function ToolPageClient({ toolId }: ToolPageClientProps) {
             {files.length > 0 && (
               <button
                 onClick={processFiles}
-                className={`w-full bg-gradient-to-r ${tool.color} text-white py-3.5 sm:py-4 rounded-lg sm:rounded-xl font-semibold hover:opacity-90 active:opacity-80 transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-base sm:text-lg`}
+                disabled={tool.requiresApiKey && !apiKey}
+                className={`w-full bg-gradient-to-r ${tool.color} text-white py-3.5 sm:py-4 rounded-lg sm:rounded-xl font-semibold transition-all shadow-lg flex items-center justify-center gap-2 text-base sm:text-lg ${
+                  tool.requiresApiKey && !apiKey
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:opacity-90 active:opacity-80 hover:shadow-xl'
+                }`}
               >
-                開始處理
+                {tool.requiresApiKey && !apiKey ? '請先輸入 API Key' : '開始處理'}
                 <ArrowLeft className="w-5 h-5 rotate-180" />
               </button>
             )}

@@ -31,6 +31,7 @@ export interface ToolConfig {
   multiple: boolean
   instructions?: string[]
   options?: ToolOption[]
+  requiresApiKey?: boolean  // 需要用戶提供 Gemini API Key
 }
 
 // 工具配置
@@ -220,7 +221,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ocr/recognize',
     acceptFiles: '.pdf,.jpg,.jpeg,.png',
     multiple: false,
-    instructions: ['上傳掃描件或圖片檔案', '選擇文件語言以提升辨識準確度', '系統自動辨識圖片中的文字'],
+    requiresApiKey: true,
+    instructions: ['上傳掃描件或圖片檔案', '輸入您的 Gemini API Key', '選擇文件語言以提升辨識準確度'],
     options: [
       {
         id: 'lang', label: '語言', type: 'select',
@@ -241,7 +243,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ocr/make-searchable',
     acceptFiles: '.pdf',
     multiple: false,
-    instructions: ['上傳掃描版 PDF 檔案', '系統在背景執行 OCR 辨識', '下載後可使用 Ctrl+F 搜尋文字'],
+    requiresApiKey: true,
+    instructions: ['上傳掃描版 PDF 檔案', '輸入您的 Gemini API Key', '下載後可使用 Ctrl+F 搜尋文字'],
   },
 
   // 安全
@@ -356,7 +359,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ai/summarize',
     acceptFiles: '.pdf',
     multiple: false,
-    instructions: ['上傳 PDF 文件', 'AI 自動分析文件內容', '生成重點摘要和關鍵資訊'],
+    requiresApiKey: true,
+    instructions: ['上傳 PDF 文件', '輸入您的 Gemini API Key', 'AI 自動分析並生成摘要'],
   },
   'ai-translate': {
     name: 'AI 翻譯',
@@ -366,7 +370,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ai/translate',
     acceptFiles: '.pdf',
     multiple: false,
-    instructions: ['上傳要翻譯的 PDF', '選擇目標語言', 'AI 保留原始版面進行翻譯'],
+    requiresApiKey: true,
+    instructions: ['上傳要翻譯的 PDF', '輸入您的 Gemini API Key', '選擇目標語言'],
     options: [
       {
         id: 'target_lang', label: '目標語言', type: 'select',
@@ -389,6 +394,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ai/analyze',
     acceptFiles: '.pdf',
     multiple: false,
+    requiresApiKey: true,
+    instructions: ['上傳 PDF 文件', '輸入您的 Gemini API Key', 'AI 自動分析文件內容'],
   },
 
   // AI 進階
@@ -400,6 +407,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ai-advanced/compare',
     acceptFiles: '.pdf',
     multiple: true,
+    requiresApiKey: true,
+    instructions: ['上傳兩份 PDF 合約', '輸入您的 Gemini API Key', 'AI 自動比對差異'],
   },
   'ai-pii': {
     name: 'AI 個資偵測',
@@ -409,6 +418,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ai-advanced/pii-detect',
     acceptFiles: '.pdf',
     multiple: false,
+    requiresApiKey: true,
+    instructions: ['上傳 PDF 文件', '輸入您的 Gemini API Key', 'AI 自動偵測個資'],
     options: [{ id: 'redact', label: '自動遮蔽個資', type: 'checkbox', default: false }]
   },
   'ai-table': {
@@ -419,6 +430,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ai-advanced/extract-table',
     acceptFiles: '.pdf',
     multiple: false,
+    requiresApiKey: true,
+    instructions: ['上傳包含表格的 PDF', '輸入您的 Gemini API Key', '選擇輸出格式'],
     options: [
       {
         id: 'format', label: '輸出格式', type: 'select',
@@ -439,6 +452,8 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/ai-advanced/smart-rename',
     acceptFiles: '.pdf',
     multiple: false,
+    requiresApiKey: true,
+    instructions: ['上傳 PDF 文件', '輸入您的 Gemini API Key', 'AI 自動生成檔名'],
   },
 
   // 批次
@@ -605,11 +620,11 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/extract/analyze-form',
     acceptFiles: '.pdf',
     multiple: false,
+    requiresApiKey: true,
     instructions: [
       '上傳包含表單的 PDF（可以是掃描檔）',
-      'AI 自動辨識文件中的欄位結構',
-      '查看可提取的欄位清單',
-      '用於確認欄位後進行批次提取'
+      '輸入您的 Gemini API Key',
+      'AI 自動辨識文件中的欄位結構'
     ],
     options: [
       { id: 'use_ocr', label: '使用 OCR（掃描檔需勾選）', type: 'checkbox', default: false }
@@ -623,10 +638,11 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/extract/extract-batch',
     acceptFiles: '.pdf',
     multiple: true,
+    requiresApiKey: true,
     instructions: [
       '上傳多個格式相同的 PDF 表單',
+      '輸入您的 Gemini API Key',
       '輸入要提取的欄位名稱（逗號分隔）',
-      '系統批次處理所有檔案',
       '下載包含所有資料的 CSV 檔案'
     ],
     options: [
@@ -642,11 +658,11 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/extract/business-card',
     acceptFiles: '.jpg,.jpeg,.png,.pdf',
     multiple: false,
+    requiresApiKey: true,
     instructions: [
       '上傳名片照片或掃描檔',
-      'AI 自動辨識名片上的文字',
-      '提取姓名、公司、職稱、電話、Email 等資訊',
-      '結構化呈現方便複製使用'
+      '輸入您的 Gemini API Key',
+      'AI 自動辨識並提取聯絡資訊'
     ],
   },
   'batch-business-cards': {
@@ -657,11 +673,11 @@ export const toolConfig: Record<string, ToolConfig> = {
     apiEndpoint: '/api/extract/business-cards-csv',
     acceptFiles: '.jpg,.jpeg,.png',
     multiple: true,
+    requiresApiKey: true,
     instructions: [
       '選擇多張名片圖片',
-      '系統自動辨識每張名片的聯絡資訊',
-      '所有資料整理成表格格式',
-      '下載 CSV 檔案匯入通訊錄或 CRM'
+      '輸入您的 Gemini API Key',
+      '系統自動辨識並匯出 CSV'
     ],
   },
 }
