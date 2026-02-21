@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 環境變數
+.env
+
+# 上傳和輸出目錄
+uploads/
+outputs/
+
+# 測試
+.pytest_cache/
+.coverage
+htmlcov/
+
+# 其他
+*.log
+.DS_Store

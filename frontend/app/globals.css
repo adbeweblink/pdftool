@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
+}
+
+.dark {
+  --foreground-rgb: 255, 255, 255;
+  --background-rgb: 17, 24, 39;
+}
+
+html {
+  background-color: rgb(var(--background-rgb));
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background-color: rgb(var(--background-rgb));
+  min-height: 100vh;
+}
+
+/* 深色模式基本樣式 */
+.dark body {
+  @apply bg-gray-900 text-gray-100;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* 工具卡片 hover 效果 */
+  .tool-card {
+    @apply bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-100 dark:border-gray-700
+           transition-all duration-300 ease-out cursor-pointer
+           hover:shadow-xl hover:-translate-y-1 dark:hover:bg-gray-700;
+  }
+
+  /* 漸層按鈕 */
+  .btn-primary {
+    @apply px-6 py-3 rounded-lg font-semibold text-white
+           bg-gradient-to-r from-pdf-red to-pdf-orange
+           hover:from-pdf-orange hover:to-pdf-red
+           transition-all duration-300 shadow-md hover:shadow-lg;
+  }
+
+  .btn-secondary {
+    @apply px-6 py-3 rounded-lg font-semibold text-gray-700 dark:text-gray-200
+           bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600
+           transition-all duration-300;
+  }
+
+  /* 上傳區域 */
+  .upload-zone {
+    @apply border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-2xl p-12
+           bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 hover:border-gray-400 dark:hover:border-gray-500
+           transition-all duration-300 cursor-pointer
+           flex flex-col items-center justify-center gap-4;
+  }
+
+  .upload-zone.dragging {
+    @apply border-pdf-red bg-red-50 dark:bg-red-900/20;
+  }
+
+  /* 分類標籤 */
+  .category-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+  }
+
+  /* 工具圖示容器 */
+  .tool-icon {
+    @apply w-14 h-14 rounded-xl flex items-center justify-center
+           transition-transform duration-300;
+  }
+
+  .tool-card:hover .tool-icon {
+    @apply scale-110;
+  }
+
+  /* 進度條 */
+  .progress-bar {
+    @apply h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden;
+  }
+
+  .progress-bar-fill {
+    @apply h-full bg-gradient-to-r from-pdf-red to-pdf-orange
+           transition-all duration-300 ease-out;
+  }
+
+  /* 頁面標題 */
+  .page-title {
+    @apply text-4xl font-bold text-gray-900 dark:text-white text-center mb-4;
+  }
+
+  .page-subtitle {
+    @apply text-xl text-gray-600 dark:text-gray-300 text-center mb-12;
+  }
+
+  /* 功能區塊 */
+  .feature-section {
+    @apply py-16 px-4;
+  }
+
+  .feature-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6
+           max-w-7xl mx-auto;
+  }
+
+  /* 分類區塊 */
+  .category-section {
+    @apply mb-16;
+  }
+
+  .category-title {
+    @apply text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3;
+  }
+
+  /* 拖放提示 */
+  .drop-hint {
+    @apply text-center text-gray-500 dark:text-gray-400;
+  }
+
+  /* 檔案列表 */
+  .file-item {
+    @apply flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700
+           hover:border-gray-300 dark:hover:border-gray-600 transition-colors;
+  }
+
+  /* 結果預覽 */
+  .result-preview {
+    @apply bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 border border-gray-100 dark:border-gray-700;
+  }
+
+  /* 動畫 */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Toast 滑入動畫 */
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(100%);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* 載入動畫 */
+  .loading-spinner {
+    @apply w-8 h-8 border-4 border-gray-200 dark:border-gray-700 border-t-pdf-red rounded-full;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Skeleton shimmer 動畫 */
+  .skeleton-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skeleton-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    animation: shimmer 1.5s infinite;
+  }
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* 工具提示 */
+  .tooltip {
+    @apply absolute z-50 px-3 py-2 text-sm text-white bg-gray-900 dark:bg-gray-700 rounded-lg
+           opacity-0 invisible transition-all duration-200;
+  }
+
+  .tooltip-trigger:hover .tooltip {
+    @apply opacity-100 visible;
+  }
+}
+
+/* 自訂滾動條 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #374151;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}

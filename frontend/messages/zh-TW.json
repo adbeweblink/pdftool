@@ -1,0 +1,112 @@
+{
+  "common": {
+    "appName": "PDF救星",
+    "loading": "載入中...",
+    "error": "發生錯誤",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "確認",
+    "save": "儲存",
+    "delete": "刪除",
+    "download": "下載",
+    "upload": "上傳",
+    "close": "關閉",
+    "search": "搜尋",
+    "searchPlaceholder": "搜尋工具...",
+    "noResults": "沒有找到結果"
+  },
+  "nav": {
+    "home": "首頁",
+    "tools": "工具",
+    "workflow": "工作流",
+    "pricing": "價格",
+    "about": "關於",
+    "login": "登入",
+    "getStarted": "開始使用"
+  },
+  "home": {
+    "title": "PDF救星",
+    "subtitle": "無需下載軟體，輕鬆處理所有 PDF 任務",
+    "uploadTitle": "拖放檔案至此",
+    "uploadSubtitle": "或點擊選擇檔案",
+    "uploadHint": "支援 PDF、Word、Excel、PowerPoint、圖片等格式",
+    "popularTools": "熱門工具",
+    "allTools": "所有工具",
+    "viewAll": "查看全部"
+  },
+  "tools": {
+    "merge": {
+      "name": "合併 PDF",
+      "description": "將多個 PDF 檔案合併為一個"
+    },
+    "split": {
+      "name": "分割 PDF",
+      "description": "將 PDF 分割成多個檔案"
+    },
+    "compress": {
+      "name": "壓縮 PDF",
+      "description": "減小 PDF 檔案大小"
+    },
+    "pdfToWord": {
+      "name": "PDF 轉 Word",
+      "description": "將 PDF 轉換為可編輯的 Word 文件"
+    },
+    "wordToPdf": {
+      "name": "Word 轉 PDF",
+      "description": "將 Word 文件轉換為 PDF"
+    },
+    "pdfToImage": {
+      "name": "PDF 轉圖片",
+      "description": "將 PDF 頁面轉換為圖片"
+    },
+    "imageToPdf": {
+      "name": "圖片轉 PDF",
+      "description": "將圖片轉換為 PDF"
+    },
+    "ocr": {
+      "name": "OCR 文字辨識",
+      "description": "從圖片或掃描的 PDF 中提取文字"
+    },
+    "watermark": {
+      "name": "添加浮水印",
+      "description": "在 PDF 上添加文字或圖片浮水印"
+    },
+    "sign": {
+      "name": "電子簽名",
+      "description": "在 PDF 上添加電子簽名"
+    },
+    "rotate": {
+      "name": "旋轉 PDF",
+      "description": "旋轉 PDF 頁面方向"
+    },
+    "protect": {
+      "name": "加密 PDF",
+      "description": "為 PDF 添加密碼保護"
+    },
+    "unlock": {
+      "name": "解鎖 PDF",
+      "description": "移除 PDF 密碼"
+    }
+  },
+  "workflow": {
+    "title": "工作流編輯器",
+    "description": "視覺化設計 PDF 處理流程",
+    "newWorkflow": "新工作流",
+    "save": "儲存",
+    "run": "執行",
+    "nodePanel": "節點面板",
+    "addNode": "新增節點",
+    "deleteNode": "刪除節點",
+    "help": "說明"
+  },
+  "footer": {
+    "description": "免費、安全、快速的線上 PDF 工具",
+    "tools": "工具",
+    "company": "公司",
+    "support": "支援",
+    "privacy": "隱私政策",
+    "terms": "服務條款",
+    "contact": "聯絡我們",
+    "copyright": "版權所有"
+  }
+}

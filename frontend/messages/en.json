@@ -1,0 +1,112 @@
+{
+  "common": {
+    "appName": "PDF Toolbox",
+    "loading": "Loading...",
+    "error": "Error occurred",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "download": "Download",
+    "upload": "Upload",
+    "close": "Close",
+    "search": "Search",
+    "searchPlaceholder": "Search tools...",
+    "noResults": "No results found"
+  },
+  "nav": {
+    "home": "Home",
+    "tools": "Tools",
+    "workflow": "Workflow",
+    "pricing": "Pricing",
+    "about": "About",
+    "login": "Login",
+    "getStarted": "Get Started"
+  },
+  "home": {
+    "title": "Free Online PDF Tools",
+    "subtitle": "Process all your PDF tasks without downloading software",
+    "uploadTitle": "Drop files here",
+    "uploadSubtitle": "or click to select files",
+    "uploadHint": "Supports PDF, Word, Excel, PowerPoint, images and more",
+    "popularTools": "Popular Tools",
+    "allTools": "All Tools",
+    "viewAll": "View All"
+  },
+  "tools": {
+    "merge": {
+      "name": "Merge PDF",
+      "description": "Combine multiple PDF files into one"
+    },
+    "split": {
+      "name": "Split PDF",
+      "description": "Split PDF into multiple files"
+    },
+    "compress": {
+      "name": "Compress PDF",
+      "description": "Reduce PDF file size"
+    },
+    "pdfToWord": {
+      "name": "PDF to Word",
+      "description": "Convert PDF to editable Word document"
+    },
+    "wordToPdf": {
+      "name": "Word to PDF",
+      "description": "Convert Word document to PDF"
+    },
+    "pdfToImage": {
+      "name": "PDF to Image",
+      "description": "Convert PDF pages to images"
+    },
+    "imageToPdf": {
+      "name": "Image to PDF",
+      "description": "Convert images to PDF"
+    },
+    "ocr": {
+      "name": "OCR",
+      "description": "Extract text from images or scanned PDFs"
+    },
+    "watermark": {
+      "name": "Add Watermark",
+      "description": "Add text or image watermark to PDF"
+    },
+    "sign": {
+      "name": "E-Sign",
+      "description": "Add electronic signature to PDF"
+    },
+    "rotate": {
+      "name": "Rotate PDF",
+      "description": "Rotate PDF page orientation"
+    },
+    "protect": {
+      "name": "Protect PDF",
+      "description": "Add password protection to PDF"
+    },
+    "unlock": {
+      "name": "Unlock PDF",
+      "description": "Remove PDF password"
+    }
+  },
+  "workflow": {
+    "title": "Workflow Editor",
+    "description": "Visually design PDF processing flows",
+    "newWorkflow": "New Workflow",
+    "save": "Save",
+    "run": "Run",
+    "nodePanel": "Node Panel",
+    "addNode": "Add Node",
+    "deleteNode": "Delete Node",
+    "help": "Help"
+  },
+  "footer": {
+    "description": "Free, secure, and fast online PDF tools",
+    "tools": "Tools",
+    "company": "Company",
+    "support": "Support",
+    "privacy": "Privacy Policy",
+    "terms": "Terms of Service",
+    "contact": "Contact Us",
+    "copyright": "All rights reserved"
+  }
+}

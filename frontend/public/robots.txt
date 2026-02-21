@@ -1,0 +1,9 @@
+# PDF 工具箱 Robots.txt
+User-agent: *
+Allow: /
+
+# 禁止爬取 API 路徑
+Disallow: /api/
+
+# Sitemap 位置
+Sitemap: /sitemap.xml

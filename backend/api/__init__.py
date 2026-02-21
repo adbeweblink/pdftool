@@ -1,0 +1,14 @@
+from .basic import router as basic_router
+from .convert import router as convert_router
+from .ocr import router as ocr_router
+from .edit import router as edit_router
+from .sign import router as sign_router
+from .security import router as security_router
+from .advanced import router as advanced_router
+from .ai import router as ai_router
+from .ai_advanced import router as ai_advanced_router
+from .workflow import router as workflow_router
+from .batch import router as batch_router
+from .multimedia import router as multimedia_router
+from .pdf_editor import router as pdf_editor_router
+from .batch_extract import router as batch_extract_router
