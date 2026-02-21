@@ -61,10 +61,10 @@ app = FastAPI(
 )
 
 # CORS 設定
-# 開發環境允許 localhost，生產環境應改為實際域名
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://pdftool-tw.netlify.app",  # 生產環境
 ]
 
 app.add_middleware(
