@@ -147,10 +147,10 @@ class WorkflowExecution(BaseModel):
 # ============ 工作流儲存 ============
 
 WORKFLOWS_DIR = Path(settings.OUTPUT_DIR) / "workflows"
-WORKFLOWS_DIR.mkdir(exist_ok=True)
+WORKFLOWS_DIR.mkdir(parents=True, exist_ok=True)
 
 EXECUTIONS_DIR = Path(settings.OUTPUT_DIR) / "executions"
-EXECUTIONS_DIR.mkdir(exist_ok=True)
+EXECUTIONS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 def save_workflow(workflow: WorkflowDefinition) -> Path:
