@@ -21,7 +21,7 @@ const config: Config = {
         'pdf-pink': '#E91E63',
       },
       fontFamily: {
-        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+        sans: ['var(--font-inter)', 'var(--font-noto-sans-tc)', 'sans-serif'],
       },
     },
   },
