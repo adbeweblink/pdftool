@@ -2,27 +2,28 @@
 Gemini Vision OCR - 使用 Gemini API 進行 OCR 文字辨識
 比 PaddleOCR 更準確，特別是對中文和混合語言
 """
-import os
 import base64
 import logging
 from pathlib import Path
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Tuple
 import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
-# 設定 Gemini API
-_gemini_configured = False
+# 設定 Gemini API - BYOK 模式
+_last_configured_key = None
 
-def configure_gemini():
-    """設定 Gemini API"""
-    global _gemini_configured
-    if not _gemini_configured:
-        api_key = os.environ.get("GEMINI_API_KEY")
-        if not api_key:
-            raise ValueError("請設定 GEMINI_API_KEY 環境變數")
+def configure_gemini(api_key: str = None):
+    """設定 Gemini API - BYOK 模式"""
+    global _last_configured_key
+
+    if not api_key:
+        raise ValueError("⚠️ 請提供您的 Gemini API Key 才能使用 OCR 功能")
+
+    # 只在 key 變更時重新設定
+    if api_key != _last_configured_key:
         genai.configure(api_key=api_key)
-        _gemini_configured = True
+        _last_configured_key = api_key
 
 
 def image_to_base64(image_path: Path) -> str:
@@ -45,18 +46,19 @@ def get_mime_type(image_path: Path) -> str:
     return mime_map.get(ext, "image/png")
 
 
-def ocr_image(image_path: Path, lang: str = "ch") -> Tuple[str, List[Dict]]:
+def ocr_image(image_path: Path, lang: str = "ch", api_key: str = None) -> Tuple[str, List[Dict]]:
     """
-    使用 Gemini Vision 進行 OCR
+    使用 Gemini Vision 進行 OCR - BYOK 模式
 
     Args:
         image_path: 圖片路徑
         lang: 語言提示（ch=中文, en=英文, japan=日文）
+        api_key: 用戶的 Gemini API Key
 
     Returns:
         (文字內容, 詳細資訊列表)
     """
-    configure_gemini()
+    configure_gemini(api_key)
 
     # 讀取圖片
     image_data = image_to_base64(image_path)
@@ -113,14 +115,14 @@ def ocr_image(image_path: Path, lang: str = "ch") -> Tuple[str, List[Dict]]:
         raise
 
 
-def ocr_image_with_boxes(image_path: Path, lang: str = "ch") -> Tuple[str, List[Dict]]:
+def ocr_image_with_boxes(image_path: Path, lang: str = "ch", api_key: str = None) -> Tuple[str, List[Dict]]:
     """
-    使用 Gemini Vision 進行 OCR，嘗試取得文字區塊位置
+    使用 Gemini Vision 進行 OCR，嘗試取得文字區塊位置 - BYOK 模式
 
     注意：Gemini 的座標資訊不如專門的 OCR 引擎精確，
     這個函數主要用於需要大致位置資訊的場景
     """
-    configure_gemini()
+    configure_gemini(api_key)
 
     image_data = image_to_base64(image_path)
     mime_type = get_mime_type(image_path)
@@ -181,16 +183,15 @@ def ocr_image_with_boxes(image_path: Path, lang: str = "ch") -> Tuple[str, List[
 
         except json.JSONDecodeError:
             # 如果 JSON 解析失敗，回退到簡單模式
-            return ocr_image(image_path, lang)
+            return ocr_image(image_path, lang, api_key)
 
     except Exception as e:
         logger.error(f"Gemini OCR with boxes 失敗: {e}")
         raise
 
 
-def is_gemini_available() -> bool:
-    """檢查 Gemini API 是否可用"""
-    api_key = os.environ.get("GEMINI_API_KEY")
+def is_gemini_available(api_key: str = None) -> bool:
+    """檢查 Gemini API 是否可用 - BYOK 模式，需要用戶提供 API Key"""
     return bool(api_key)
 
 

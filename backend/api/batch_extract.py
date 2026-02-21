@@ -5,21 +5,18 @@ import fitz
 import json
 import csv
 import io
-import os
-import base64
 import httpx
 from pathlib import Path
 from fastapi import APIRouter, UploadFile, File, HTTPException, Form
-from fastapi.responses import StreamingResponse, JSONResponse
+from fastapi.responses import StreamingResponse
 from typing import List, Optional
 from pydantic import BaseModel
 
-from utils.file_handler import save_upload_file, generate_output_path
+from utils.file_handler import save_upload_file
 
 router = APIRouter()
 
 # Gemini API 設定
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
 # 延遲載入 PaddleOCR
@@ -60,12 +57,12 @@ class BusinessCardData(BaseModel):
 
 
 # ============ 輔助函數 ============
-async def call_gemini_for_extraction(text: str, prompt: str) -> dict:
-    """呼叫 Gemini API 進行智能提取"""
-    if not GEMINI_API_KEY:
+async def call_gemini_for_extraction(text: str, prompt: str, api_key: str) -> dict:
+    """呼叫 Gemini API 進行智能提取 - BYOK 模式"""
+    if not api_key:
         raise HTTPException(
-            status_code=500,
-            detail="AI 服務未設定。請聯繫管理員設定 GEMINI_API_KEY。"
+            status_code=400,
+            detail="⚠️ 請提供您的 Gemini API Key 才能使用此功能。"
         )
 
     full_prompt = f"""{prompt}
@@ -80,7 +77,7 @@ async def call_gemini_for_extraction(text: str, prompt: str) -> dict:
     try:
         async with httpx.AsyncClient(timeout=60.0) as client:
             response = await client.post(
-                f"{GEMINI_API_URL}?key={GEMINI_API_KEY}",
+                f"{GEMINI_API_URL}?key={api_key}",
                 json={
                     "contents": [{"parts": [{"text": full_prompt}]}],
                     "generationConfig": {
@@ -179,7 +176,8 @@ def extract_text_with_ocr(file_path: Path) -> str:
 @router.post("/analyze-form")
 async def analyze_form_structure(
     file: UploadFile = File(...),
-    use_ocr: bool = Form(False, description="是否使用 OCR（掃描檔需要）")
+    use_ocr: bool = Form(False, description="是否使用 OCR（掃描檔需要）"),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     分析 PDF 表單結構，辨識所有欄位
@@ -226,7 +224,7 @@ async def analyze_form_structure(
     "total_fields": 欄位數量
 }"""
 
-        result = await call_gemini_for_extraction(text, prompt)
+        result = await call_gemini_for_extraction(text, prompt, api_key)
         result["raw_text_preview"] = text[:500] + "..." if len(text) > 500 else text
 
         return {
@@ -243,7 +241,8 @@ async def analyze_form_structure(
 async def extract_batch_form_data(
     files: List[UploadFile] = File(...),
     fields: str = Form(..., description="要提取的欄位（逗號分隔或 JSON 陣列）"),
-    use_ocr: bool = Form(False, description="是否使用 OCR")
+    use_ocr: bool = Form(False, description="是否使用 OCR"),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     批次從多個 PDF 提取指定欄位的資料
@@ -304,7 +303,7 @@ async def extract_batch_form_data(
 
 只回傳 JSON，不要其他文字。"""
 
-            result = await call_gemini_for_extraction(text, prompt)
+            result = await call_gemini_for_extraction(text, prompt, api_key)
             result["_filename"] = file.filename
             all_data.append(result)
 
@@ -356,7 +355,8 @@ async def extract_batch_form_data(
 # ============ 名片 OCR ============
 @router.post("/business-card")
 async def extract_business_card(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     從名片圖片提取聯絡資訊
@@ -406,7 +406,7 @@ async def extract_business_card(
 
 沒有的欄位填 null。只回傳 JSON。"""
 
-        result = await call_gemini_for_extraction(text, prompt)
+        result = await call_gemini_for_extraction(text, prompt, api_key)
         result["raw_text"] = text
 
         return {
@@ -421,7 +421,8 @@ async def extract_business_card(
 # ============ 批次名片處理 ============
 @router.post("/business-cards-batch")
 async def extract_business_cards_batch(
-    files: List[UploadFile] = File(...)
+    files: List[UploadFile] = File(...),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     批次處理多張名片，整理成客戶資料表
@@ -462,7 +463,7 @@ async def extract_business_cards_batch(
 
 沒有的欄位填 null。只回傳 JSON。"""
 
-            result = await call_gemini_for_extraction(text, prompt)
+            result = await call_gemini_for_extraction(text, prompt, api_key)
             result["_filename"] = file.filename
             all_cards.append(result)
 
@@ -524,7 +525,8 @@ async def extract_business_cards_batch(
 # ============ 批次名片匯出 CSV ============
 @router.post("/business-cards-csv")
 async def export_business_cards_csv(
-    files: List[UploadFile] = File(...)
+    files: List[UploadFile] = File(...),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     批次處理名片並直接匯出 CSV
@@ -558,7 +560,7 @@ async def export_business_cards_csv(
 
 沒有的欄位填 null。只回傳 JSON。"""
 
-            result = await call_gemini_for_extraction(text, prompt)
+            result = await call_gemini_for_extraction(text, prompt, api_key)
             result["_filename"] = file.filename
             all_cards.append(result)
 

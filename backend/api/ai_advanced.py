@@ -3,7 +3,6 @@ AI 進階功能 API - 合約比對、個資偵測、表格提取、智能重命�
 """
 import fitz
 import base64
-import os
 import json
 import re
 import httpx
@@ -18,7 +17,6 @@ from utils.file_handler import save_upload_file, generate_output_path
 router = APIRouter()
 
 # Gemini API 設定
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent"
 
 
@@ -65,18 +63,18 @@ def extract_pdf_tables(file_path) -> list:
     return all_tables
 
 
-async def call_gemini_advanced(prompt: str, max_tokens: int = 4096) -> str:
-    """呼叫 Gemini API（進階版，支援更長輸出）"""
-    if not GEMINI_API_KEY:
+async def call_gemini_advanced(prompt: str, api_key: str, max_tokens: int = 4096) -> str:
+    """呼叫 Gemini API（進階版，支援更長輸出）- BYOK 模式"""
+    if not api_key:
         raise HTTPException(
-            status_code=500,
-            detail="⚠️ GEMINI_API_KEY 未設定。請在環境變數中設定後重試。"
+            status_code=400,
+            detail="⚠️ 請提供您的 Gemini API Key 才能使用此功能。"
         )
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         try:
             response = await client.post(
-                f"{GEMINI_API_URL}?key={GEMINI_API_KEY}",
+                f"{GEMINI_API_URL}?key={api_key}",
                 json={
                     "contents": [{
                         "parts": [{"text": prompt}]
@@ -125,7 +123,8 @@ async def compare_contracts(
     focus_areas: str = Form(
         "all",
         description="關注重點：all=全部, terms=條款, numbers=金額日期, parties=當事人"
-    )
+    ),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     比對兩份合約的差異
@@ -182,7 +181,7 @@ async def compare_contracts(
 請用繁體中文回答，確保輸出清晰易讀。
 """
 
-        result = await call_gemini_advanced(prompt)
+        result = await call_gemini_advanced(prompt, api_key)
 
         return {
             "success": True,
@@ -205,7 +204,8 @@ async def detect_pii(
     pii_types: str = Form(
         "all",
         description="個資類型：all, id=身分證, phone=電話, email=電子郵件, address=地址, account=帳號"
-    )
+    ),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     偵測並遮蔽 PDF 中的個人資料
@@ -306,7 +306,7 @@ async def detect_pii(
 }}
 ```
 """
-            ai_result = await call_gemini_advanced(prompt)
+            ai_result = await call_gemini_advanced(prompt, api_key)
 
             # 嘗試解析 AI 回傳的 JSON
             try:
@@ -385,7 +385,8 @@ async def redact_pii_in_pdf(file_path, pii_items: list):
 async def extract_tables(
     file: UploadFile = File(...),
     output_format: str = Form("json", description="輸出格式：json, csv, excel"),
-    use_ai: bool = Form(True, description="是否使用 AI 增強提取")
+    use_ai: bool = Form(True, description="是否使用 AI 增強提取"),
+    api_key: str = Form(None, description="您的 Gemini API Key（使用 AI 增強時必填）")
 ):
     """
     從 PDF 提取表格並轉換為結構化資料
@@ -402,6 +403,8 @@ async def extract_tables(
 
         # 如果啟用 AI 增強，使用 AI 改善表格結構
         if use_ai and tables:
+            if not api_key:
+                raise HTTPException(status_code=400, detail="⚠️ 使用 AI 增強功能需要提供您的 Gemini API Key")
             prompt = f"""請分析以下從 PDF 提取的表格資料，並：
 1. 修正任何提取錯誤
 2. 識別表頭
@@ -428,7 +431,7 @@ async def extract_tables(
 }}
 ```
 """
-            ai_result = await call_gemini_advanced(prompt)
+            ai_result = await call_gemini_advanced(prompt, api_key)
 
             try:
                 json_match = re.search(r'```json\s*([\s\S]*?)\s*```', ai_result)
@@ -439,7 +442,7 @@ async def extract_tables(
                 pass  # 使用原始表格
 
         # 如果沒有偵測到表格，嘗試用 AI 從文字中提取
-        if not tables:
+        if not tables and api_key:
             text = extract_pdf_text(file_path)
             prompt = f"""請從以下文件中提取所有表格資料。即使是用空格或 Tab 對齊的資料也算表格。
 
@@ -462,7 +465,7 @@ async def extract_tables(
 
 如果沒有找到任何表格，回傳空陣列。
 """
-            ai_result = await call_gemini_advanced(prompt)
+            ai_result = await call_gemini_advanced(prompt, api_key)
 
             try:
                 json_match = re.search(r'```json\s*([\s\S]*?)\s*```', ai_result)
@@ -551,7 +554,8 @@ async def smart_rename(
         description="命名模式：auto=自動, date_title=日期_標題, type_date=類型_日期"
     ),
     include_date: bool = Form(True, description="是否包含日期"),
-    max_length: int = Form(50, description="檔名最大長度")
+    max_length: int = Form(50, description="檔名最大長度"),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     根據 PDF 內容智能生成檔名
@@ -593,7 +597,7 @@ async def smart_rename(
 4. 要有辨識度，方便日後搜尋
 """
 
-        ai_result = await call_gemini_advanced(prompt)
+        ai_result = await call_gemini_advanced(prompt, api_key)
 
         try:
             json_match = re.search(r'```json\s*([\s\S]*?)\s*```', ai_result)
@@ -650,7 +654,8 @@ async def smart_rename(
 @router.post("/batch-smart-rename")
 async def batch_smart_rename(
     files: List[UploadFile] = File(...),
-    naming_pattern: str = Form("auto")
+    naming_pattern: str = Form("auto"),
+    api_key: str = Form(..., description="您的 Gemini API Key")
 ):
     """
     批次智能重命名多個 PDF
@@ -661,7 +666,8 @@ async def batch_smart_rename(
         try:
             result = await smart_rename(
                 file=file,
-                naming_pattern=naming_pattern
+                naming_pattern=naming_pattern,
+                api_key=api_key
             )
             results.append({
                 "original": file.filename,
